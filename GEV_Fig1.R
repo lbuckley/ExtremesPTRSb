@@ -116,7 +116,7 @@ cols.lat=blue2green(max(sites[,"col"]))
 
 #set up plots
 setwd(paste(fdir,"figures\\",sep=""))
-file<-paste(var,"Hist.pdf" ,sep="", collapse=NULL)
+file<-paste(var,"Hist_1980.pdf" ,sep="", collapse=NULL)
 pdf(file,height = 8, width = 11)
 
 #set up density plots
@@ -153,6 +153,9 @@ for(stat.k in 1:nrow(sites) ){  #1:nrow(sites)
     if(nlat) dat= dat[dat$month %in% c(6,7,8),]
     #if southern lat
     if(!nlat) dat= dat[dat$month %in% c(1,2,12),]
+    
+    #subset to last 30 years
+    dat= dat[dat$year>1979,]
     
     #Format data
     dat$var[which(dat$var==-9999)]= NA
