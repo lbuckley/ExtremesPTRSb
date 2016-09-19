@@ -113,10 +113,11 @@ for(con in 1:length(conts) ){
 }
 
 cols.lat=blue2green(max(sites[,"col"]))
+#cols.lat=blue2red(max(sites[,"col"]))
 
 #set up plots
 setwd(paste(fdir,"figures\\",sep=""))
-file<-paste(var,"Hist_1980.pdf" ,sep="", collapse=NULL)
+file<-paste(var,"Hist_1980_rb.pdf" ,sep="", collapse=NULL)
 pdf(file,height = 8, width = 11)
 
 #set up density plots
@@ -200,7 +201,7 @@ for(stat.k in 1:nrow(sites) ){  #1:nrow(sites)
     
     if(sites[stat.k,"cont"]=="noa") lat.lab1= c("24?N",rep("", length(site.g)-2) ,"65?N")
     if(sites[stat.k,"cont"]=="asia") lat.lab1= c("11?N",rep("", length(site.g)-2) ,"74?N")
-    legend("topleft", fill=cols.lat,border=cols.lat, cex=1,legend=lat.lab1, bty="n", y.intersp=0.5)
+    legend("topleft", fill=rev(cols.lat),border=rev(cols.lat), cex=1,legend=rev(lat.lab1), bty="n", y.intersp=0.5)
     
   }
   if(sites[stat.k,"cont"]==cont.last) points(d.Ta, col=cols.lat[sites[stat.k,"col"]], type="l")
