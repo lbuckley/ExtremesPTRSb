@@ -1,6 +1,12 @@
+## Code from Kingsolver JG and Buckley LB. 2017. Quantifying thermal extremes and biological variation to predict evolutionary responses to changing climate. Phil. Trans. R. Soc. B. 
+## Code for Colias example in text
+##
+###########################################
+
 #CALCULATE EXTREMES ACROSS GEOGRAPHY
 count= function(x) length(na.omit(x))
 
+#set base directory
 fdir= "C:\\Users\\Buckley\\Google Drive\\Buckley\\Work\\ExtremesPhilTrans\\"
 
 #library(sp)
@@ -30,13 +36,12 @@ gev.fit.wrap= function(xdat, ydat, sigl=1, show=FALSE) try(gev.fit(xdat, ydat, s
 #STATIONS
 #STATION MAP: http://www.ncdc.noaa.gov/cdo-web/datatools/findstation
 
-#Montrose: 38.4783° N, 107.8762° W
+#Montrose: 38.4783? N, 107.8762? W
 #GHCND:USC00055722
 dat.co=ghcnd_search("USC00055722", var = "TMAX")
 
-#Sacramento: 38.5816° N, 121.4944° W
+#Sacramento: 38.5816? N, 121.4944? W
 #GHCND:USW00023271
-#GHCND:USW00023232
 dat.ca=ghcnd_search("USW00023271", var = "TMAX")
 
 dat.co=dat.co$tmax
@@ -82,11 +87,8 @@ for(stat.k in 1:4){
   
 #Generalized extreme value distribution
 try(mod.gev<- gev.fit(dat1, show=FALSE) ) #stationary
-#mod.gev<- gev.fit.wrap(dat1, ydat=as.matrix(dat0$year), sigl=1, show=FALSE) # nonstationary 
-#gev.diag(mod.gev)
 if(class(mod.gev)!="try-error") ns.ext.stat[stat.k, 1]<-mod.gev$nllh
 if(class(mod.gev)!="try-error") ns.ext.stat[stat.k, 2:4]<-mod.gev$mle #add another for non-stat
-#if(class(mod.gev)!="try-error") ns.ext.stat[stat.k, 6]<-mod.gev$conv #add another for non-stat
 if(class(mod.gev)!="try-error") ns.ext.stat[stat.k,6:8]<-mod.gev$se
 
 #Generalized pareto distribution, for number of times exceeds threshold
@@ -105,7 +107,6 @@ r = rgev(n = 1000, xi =mod.gev$mle[3], mu=mod.gev$mle[1], beta=mod.gev$mle[2])
 #plot(r, type = "l", col = "steelblue") #xi = shape, mu = location, beta = scale,
 points(density(r), type="l", col="grey", lty="dashed")
 }
-
 
 } #end loop stat
 

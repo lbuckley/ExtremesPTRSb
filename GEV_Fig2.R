@@ -1,6 +1,12 @@
+## Code from Kingsolver JG and Buckley LB. 2017. Quantifying thermal extremes and biological variation to predict evolutionary responses to changing climate. Phil. Trans. R. Soc. B. 
+## Code for Figure 2
+##
+###########################################
+
 #CALCULATE EXTREMES ACROSS GEOGRAPHY
 count= function(x) length(na.omit(x))
 
+#set base directory
 fdir= "C:\\Users\\Buckley\\Google Drive\\Buckley\\Work\\ExtremesPhilTrans\\"
 
 library(ismev) #for gev
@@ -51,7 +57,7 @@ stations.un= unique(stations$Id)
 stats.elev= read.csv("ghcnd-stations.csv")
 
 #Restrict stations to those with recent data
-stations= stations[which(stations$LastYear>2010),] #stations$FirstYear<1996 & 
+stations= stations[which(stations$LastYear>2010),] 
 
 #choose var
 stations= stations[which(stations$Var==var),]
@@ -103,7 +109,7 @@ pdf(file,height = 11, width = 8)
 #set up density plots
 par(mfrow=c(4,4), cex=1.2, lwd=2, mar=c(1, 1, 1.5, 0.2), mgp=c(1.5, 0.5, 0), oma=c(2,2,0,0), bty="l")
 
-for(stat.k in 1:nrow(sites) ){  #1:nrow(sites)
+for(stat.k in 1:nrow(sites) ){  
   print(stat.k)
   
   min.dist<- order(spDistsN1(stat.coords, as.numeric(sites[stat.k,c("Lon","Lat")]), longlat = TRUE))[1:100]
@@ -167,11 +173,9 @@ sites$Ta.99[stat.k]= quantile(dat, na.rm = TRUE, probs=0.99)
 
 #Generalized extreme value distribution
 try(mod.gev<- gev.fit(dat1, show=FALSE) ) #stationary
-#mod.gev<- gev.fit.wrap(dat1, ydat=as.matrix(dat0$year), sigl=1, show=FALSE) # nonstationary 
 if(class(mod.gev)!="try-error") ns.ext.stat[stat.k, 1]<-mod.gev$nllh
 if(class(mod.gev)!="try-error") ns.ext.stat[stat.k, 2:4]<-mod.gev$mle #add another for non-stat
 if(class(mod.gev)!="try-error") ns.ext.stat[stat.k, 6]<-mod.gev$conv #add another for non-stat
-#if(class(mod.gev)!="try-error") ns.ext.stat[stat.k,6:9]<-mod.gev$se
 
 #-----------------
 #PLOT FIT
@@ -211,7 +215,7 @@ r3= rgev(n = 50000, xi = 0, mu=30, beta=4.5)
 r4= rgev(n = 50000, xi = 0, mu=50, beta=4.5)
 r5= rgev(n = 50000, xi = 0, mu=30, beta=6)
 r6= rgev(n = 50000, xi = 0, mu=50, beta=6)
-plot(density(r1), col=rcol[1], type="l", main="",xlab="Maximum daily temperature (°C)", xlim=range(18,95))
+plot(density(r1), col=rcol[1], type="l", main="",xlab="Maximum daily temperature (?C)", xlim=range(18,95))
 points(density(r2), col=rcol[1], type="l", lty="dashed")
 points(density(r3), col=rcol[2], type="l")
 points(density(r4), col=rcol[2], type="l", lty="dashed")
@@ -222,21 +226,22 @@ legend(55,0.12, lty="solid", col=rcol, cex=0.8,legend=c("scale=3", "scale=4.5", 
 legend(55,0.09, lty=c("solid","dashed"), col="black", cex=0.8,legend=c("location=30", "location=50"), bty="n")
 
 #---------------------
-#PLOT LAT PATTERNS
+#PLOT LATITUDE PATTERNS
 #divide by continents
 conts= unique(sites$cont)
-#cols= rainbow(length(conts))
 cols= c("black","gray")
 
+#Plot 99% quantile
 for(cn in 1:length(conts)){
 sites1= subset(sites, sites$cont==conts[cn])
 sites1= subset(sites1, exp(sites1$gev.scale)>0 & sites1$gev.loc>0)
-if(cn==1) plot(sites1$Lat, sites1$Ta.99, ylab="99% quantile", xlab="", main="", col=cols[cn], type="p", xlim=range(sites$st.lat), ylim=range(18,47.2))  #ylim=range(sites$Ta.99, na.rm=TRUE)
+if(cn==1) plot(sites1$Lat, sites1$Ta.99, ylab="99% quantile", xlab="", main="", col=cols[cn], type="p", xlim=range(sites$st.lat), ylim=range(18,47.2))  
 if(cn>1) points(sites1$Lat, sites1$Ta.99, col=cols[cn], type="p")
 
 if(cn==1) legend("bottomleft", col=cols, cex=1,pch=1,legend=c("North America","Asia"), bty="n")
 }
 
+#Plot GEV location
 for(cn in 1:length(conts)){
 sites1= subset(sites, sites$cont==conts[cn])
 sites1= subset(sites1, sites1$gev.scale>0 & sites1$gev.loc>0)
@@ -260,7 +265,7 @@ points(density(r4), col=rcol[4], type="l")
 legend("topright", lty="solid", col=rcol, cex=0.8,legend=c("shape= -0.3","shape= -0.1","shape= 0.0","shape= 0.1"), bty="n")
 
 #---------------------------
-
+#Plot GEV scale
 for(cn in 1:length(conts)){
   sites1= subset(sites, sites$cont==conts[cn])
   sites1= subset(sites1, sites1$gev.scale>0 & sites1$gev.loc>0)
@@ -268,6 +273,7 @@ for(cn in 1:length(conts)){
   if(cn>1) points(sites1$Lat, sites1$gev.scale, col=cols[cn], type="p")
 }
 
+#Plot GEV shape
 for(cn in 1:length(conts)){
 sites1= subset(sites, sites$cont==conts[cn])
 sites1= subset(sites1, sites1$gev.scale>0 & sites1$gev.loc>0)
@@ -275,6 +281,6 @@ if(cn==1) plot(sites1$Lat, sites1$gev.shape, ylab="GEV shape", xlab="", col=cols
 if(cn>1) points(sites1$Lat, sites1$gev.shape, col=cols[cn], type="p")
 }
 
-mtext(c("Maximum daily temperature (°C)","Latitude (°)"), at=c(0.2,0.7), side=1, line=0.5, outer=TRUE, cex=1.2)
+mtext(c("Maximum daily temperature (Â°C)","Latitude (Â°)"), at=c(0.2,0.7), side=1, line=0.5, outer=TRUE, cex=1.2)
 
 dev.off() #end output to pdf

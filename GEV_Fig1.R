@@ -1,6 +1,12 @@
+## Code from Kingsolver JG and Buckley LB. 2017. Quantifying thermal extremes and biological variation to predict evolutionary responses to changing climate. Phil. Trans. R. Soc. B. 
+## Code for Figure 1
+##
+###########################################
+
 #CALCULATE EXTREMES ACROSS GEOGRAPHY
 count= function(x) length(na.omit(x))
 
+#set base directory
 fdir= "C:\\Users\\Buckley\\Google Drive\\Buckley\\Work\\ExtremesPhilTrans\\"
 
 #library(sp)
@@ -60,7 +66,7 @@ stations.un= unique(stations$Id)
 stats.elev= read.csv("ghcnd-stations.csv")
 
 #Restrict stations to those with recent data
-stations= stations[which(stations$LastYear>2010),] #stations$FirstYear<1996 & 
+stations= stations[which(stations$LastYear>2010),] 
 
 #choose var
 stations= stations[which(stations$Var==var),]
@@ -113,7 +119,6 @@ for(con in 1:length(conts) ){
 }
 
 cols.lat=blue2green(max(sites[,"col"]))
-#cols.lat=blue2red(max(sites[,"col"]))
 
 #set up plots
 setwd(paste(fdir,"figures\\",sep=""))

@@ -1,6 +1,12 @@
+## Code from Kingsolver JG and Buckley LB. 2017. Quantifying thermal extremes and biological variation to predict evolutionary responses to changing climate. Phil. Trans. R. Soc. B. 
+## Code for Figure 3
+##
+###########################################
+
 #CALCULATE EXTREMES ACROSS TIME SCALES
 count= function(x) length(na.omit(x))
 
+#set base directory
 fdir= "C:\\Users\\Buckley\\Google Drive\\Buckley\\Work\\ExtremesPhilTrans\\"
 
 library(ismev) #for gev
@@ -23,7 +29,6 @@ library(climdex.pcic)
 #Wrapper for gev function
 gev.fit.wrap= function(xdat, ydat, sigl=1, show=FALSE) try(gev.fit(xdat, ydat, sigl=1, show=FALSE), silent=TRUE)
 julian.wrap= function(date) julian(date, origin=as.Date(paste(format(date, "%Y"),"-01-01",sep="")))
-
 
 #-----------------------------
 #Read in site data
@@ -123,13 +128,9 @@ for(stat.k in 1:2 ){
     
     dat0=dat[!is.na(dat$var),]
     dat1=dat0$var
-    #CLEAN DATA
-    #dat1= dat1[which(dat1>-10)]
     
     #Generalized extreme value distribution
     try(mod.gev<- gev.fit(dat1, show=FALSE) ) #stationary
-    #mod.gev<- gev.fit.wrap(dat1, ydat=as.matrix(dat0$year), sigl=1, show=FALSE) # nonstationary 
-    #gev.diag(mod.gev)
     if(class(mod.gev)!="try-error") ns.ext.stat[stat.k, 1]<-mod.gev$nllh
     if(class(mod.gev)!="try-error") ns.ext.stat[stat.k, 2:4]<-mod.gev$mle #add another for non-stat
     if(class(mod.gev)!="try-error") ns.ext.stat[stat.k, 6]<-mod.gev$conv #add another for non-stat
@@ -146,7 +147,6 @@ for(stat.k in 1:2 ){
     pot.day= fpot(dat0$var, threshold=30, npp=365.25, mper=mpers[m] )
     pot.week= fpot(dat.week, threshold=30, npp=365.25, mper=mpers[m] )
     if(m>4)pot.month= fpot(dat.month$var, threshold=30, npp=3, mper=mpers[m] )
-    #plot(plot.day)
     
     rl[stat.k, m, 1]=pot.day$estimate[1]
     rl[stat.k, m, 2]=pot.week$estimate[1]
@@ -166,7 +166,11 @@ for(stat.k in 1:2 ){
     dat.thresh[which(r>thresh)]=1
     dat.rl= rle(dat.thresh)
     dat.rl= dat.rl$lengths[dat.rl$values==0]
-    #plot(density(dat.rl))
+    
+    #establish list
+    if(stat.k==1) hw.list=list(dat.rl)
+    hw.list[[stat.k]]=dat.rl
+    
     hw.list[[stat.k+2]]=dat.rl
     
     thresh= quantile(r, 0.95)
@@ -174,7 +178,6 @@ for(stat.k in 1:2 ){
     dat.thresh[which(r>thresh)]=1
     dat.rl= rle(dat.thresh)
     dat.rl= dat.rl$lengths[dat.rl$values==0]
-    #points(density(dat.rl), type="l")
     hw.list[[stat.k+4]]=dat.rl
     
     thresh= quantile(r, 0.98)
@@ -182,7 +185,6 @@ for(stat.k in 1:2 ){
     dat.thresh[which(r>thresh)]=1
     dat.rl= rle(dat.thresh)
     dat.rl= dat.rl$lengths[dat.rl$values==0]
-    #points(density(dat.rl), type="l")
     hw.list[[stat.k+6]]=dat.rl
     #-----------------------
   #DENSITY PLOTS
@@ -192,11 +194,10 @@ for(stat.k in 1:2 ){
     d.year=  density( na.omit(dat.year$var)) 
     
     cols=blue2green(4)
-    #cols=brewer.pal(n = 5, name = "YlGnBu")
     
-    m.labs=c("North America, 24°N","North America, 45°N")
+    m.labs=c("North America, 24?N","North America, 45?N")
     
-    plot(d.day, xlim=range(13, 45), ylim=range(0,0.25), main=m.labs[stat.k], xlab="Maximum temperature (°C)", ylab="", cex.main=1, col=cols[1]) 
+    plot(d.day, xlim=range(13, 45), ylim=range(0,0.25), main=m.labs[stat.k], xlab="Maximum temperature (?C)", ylab="", cex.main=1, col=cols[1]) 
     points(d.week, col=cols[2], type="l")
     points(d.month, col=cols[3], type="l")
     points(d.year, col=cols[4], type="l")
@@ -214,7 +215,7 @@ for(stat.k in 1:2 ){
 rp= c(2,5,10,20,50,100)
 
 for(k in 1:2){
- labs= "Temperature (°C)"
+ labs= "Temperature (?C)"
  
 plot(rp, rl[k, 1:6, 1], type="l", ylim=range(na.omit(rl[k,1:6,])), col=cols[1], ylab=labs, xlab="Return Period (years)", main="", xlim=c(0,80))
 points(rp, rl[k, 1:6, 2], type="l", col=cols[2] )
@@ -224,7 +225,7 @@ points(rp[4:6], rl[k, 4:6, 3], type="l", col=cols[3] )
 #----------------------------
 #PLOT SIMULATED
 
-plot(density(hw.list[[3]]), col=cols[1], type="l", main="", xlim=range(0,200), ylim= range(0,0.082), xlab= "Days between heat events", lty="dotted") # xlim=range(0,60), ylim= range(0,0.1), 
+plot(density(hw.list[[3]]), col=cols[1], type="l", main="", xlim=range(0,200), ylim= range(0,0.082), xlab= "Days between heat events", lty="dotted")  
 
 points(density(hw.list[[5]]), col=cols[1], type="l", lty="dashed") 
 points(density(hw.list[[7]]), col=cols[2], type="l") 
@@ -237,6 +238,6 @@ plot(density(hw.list[[4]]), col=cols[1], type="l", main="", xlim=range(0,200), y
 points(density(hw.list[[6]]), col=cols[1], type="l", lty="dashed") 
 points(density(hw.list[[8]]), col=cols[2], type="l") 
 
-mtext(c("Density","Maximum temperature (°C)", "Density"), side = 2, line = 1, outer = TRUE, cex=1.5, at=c(0.85,0.5,0.15))
+mtext(c("Density","Maximum temperature (?C)", "Density"), side = 2, line = 1, outer = TRUE, cex=1.5, at=c(0.85,0.5,0.15))
 
 dev.off()
